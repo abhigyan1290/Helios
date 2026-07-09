@@ -1,25 +1,25 @@
 # Helios
 
-Reinforcement-learning-based scheduler for simulated GPU cluster workloads.
+Helios is a C++/Python project for studying GPU cluster job scheduling with classical
+baselines and reinforcement learning.
 
-![CI](https://github.com/abhigyan1290/Helios/actions/workflows/ci.yml/badge.svg)
+The first milestone is intentionally small: establish a clean repository, a C++20 build,
+formatting rules, CI, and a tiny smoke test before implementing simulator logic.
 
-## Overview
+## Current Status
 
-Helios simulates a fixed-size GPU cluster where ML jobs arrive over time. Each job has
-arrival time, runtime, GPU count, memory, priority, and deadline. A scheduler decides
-which jobs to run; metrics such as wait time, completion time, and GPU utilization are
-tracked and compared across classical baselines and RL agents.
+- Milestone 1 in progress: project scaffolding and CI.
+- C++ simulator logic has not been implemented yet.
+- Python bindings, Gymnasium environment, and PPO training are planned future milestones.
 
-## Stack
+## Planned Stack
 
-- **C++20** discrete-event simulator (CMake, Ninja, GoogleTest)
-- **Python 3.11+** bindings (pybind11), Gymnasium environment, Stable-Baselines3 PPO
-- **GitHub Actions** CI on Linux and Windows
+- C++20, CMake, Ninja
+- CTest for initial smoke tests; GoogleTest or Catch2 for simulator unit tests later
+- Python 3.11+, pybind11, Gymnasium, PyTorch, Stable-Baselines3
+- GitHub Actions CI
 
-## Quick Start
-
-### Build C++
+## Build
 
 ```bash
 cmake -S . -B build -G Ninja
@@ -27,41 +27,47 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
-### Run FIFO baseline
+Run the placeholder CLI:
 
 ```bash
-./build/helios_cli --scheduler fifo --seed 42 --jobs 100
+./build/helios_sim
 ```
 
-### Python tests
+On Windows PowerShell, the executable is usually:
+
+```powershell
+.\build\helios_sim.exe
+```
+
+## Format
+
+```powershell
+.\scripts\format.ps1
+```
+
+or:
 
 ```bash
-pip install -e ".[dev]"
-pytest tests/python -v
+./scripts/format.sh
 ```
 
 ## Project Structure
 
-```
-include/helios/   C++ headers
-src/              C++ implementation
-bindings/         pybind11 module
-python/helios/    Python package (env, training, benchmarks)
-tests/cpp/        GoogleTest unit tests
-tests/python/     pytest suite
-configs/          Workload YAML configs
-docs/             Architecture and metrics documentation
-```
-
-## Benchmarks
-
-See [docs/metrics.md](docs/metrics.md) for metric definitions. Run baselines:
-
-```bash
-python -m helios.benchmarks.run_baselines --config configs/workloads/small_cluster.yaml
-python -m helios.benchmarks.plot_results --input results/benchmarks.csv
+```text
+apps/helios_sim/   Command-line simulator executable
+include/helios/    Public C++ headers
+src/               C++ implementation
+tests/cpp/         C++ tests
+python/helios/     Future Python package
+tests/python/      Future pytest suite
+benchmarks/        Future benchmark runners and outputs
+configs/           Future experiment and workload configs
+docs/              Design notes and metric definitions
+scripts/           Developer scripts
 ```
 
-## License
+## Development Workflow
 
-MIT — see [LICENSE](LICENSE).
+Use one branch per issue, open pull requests into `main`, and keep every change small
+enough to review. Simulator features should include tests before they are merged.
+
