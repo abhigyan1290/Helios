@@ -1,0 +1,83 @@
+[1mdiff --git a/apps/helios_sim/main.cpp b/apps/helios_sim/main.cpp[m
+[1mindex cc411d2..42e98c9 100644[m
+[1m--- a/apps/helios_sim/main.cpp[m
+[1m+++ b/apps/helios_sim/main.cpp[m
+[36m@@ -6,4 +6,3 @@[m [mint main() {[m
+   std::cout << "Helios simulator scaffold v" << helios::version() << '\n';[m
+   return 0;[m
+ }[m
+[31m-[m
+[1mdiff --git a/include/helios/resources.hpp b/include/helios/resources.hpp[m
+[1mindex 516851e..395c511 100644[m
+[1m--- a/include/helios/resources.hpp[m
+[1m+++ b/include/helios/resources.hpp[m
+[36m@@ -14,4 +14,4 @@[m [mstruct Resources {[m
+ [m
+ void validate_resources(const Resources& resources);[m
+ [m
+[31m-}  // namespace helios[m
+[32m+[m[32m} // namespace helios[m
+[1mdiff --git a/include/helios/version.hpp b/include/helios/version.hpp[m
+[1mindex 922b2d5..a92285f 100644[m
+[1m--- a/include/helios/version.hpp[m
+[1m+++ b/include/helios/version.hpp[m
+[36m@@ -6,5 +6,4 @@[m [mnamespace helios {[m
+ [m
+ std::string_view version();[m
+ [m
+[31m-}  // namespace helios[m
+[31m-[m
+[32m+[m[32m} // namespace helios[m
+[1mdiff --git a/src/job.cpp b/src/job.cpp[m
+[1mindex e89452e..c285d31 100644[m
+[1m--- a/src/job.cpp[m
+[1m+++ b/src/job.cpp[m
+[36m@@ -21,4 +21,4 @@[m [mvoid validate_job(const Job& job) {[m
+   }[m
+ }[m
+ [m
+[31m-}  // namespace helios[m
+[32m+[m[32m} // namespace helios[m
+[1mdiff --git a/src/resources.cpp b/src/resources.cpp[m
+[1mindex 772e944..0401444 100644[m
+[1m--- a/src/resources.cpp[m
+[1m+++ b/src/resources.cpp[m
+[36m@@ -16,4 +16,4 @@[m [mvoid validate_resources(const Resources& resources) {[m
+   }[m
+ }[m
+ [m
+[31m-}  // namespace helios[m
+[32m+[m[32m} // namespace helios[m
+[1mdiff --git a/src/version.cpp b/src/version.cpp[m
+[1mindex cb45ce2..17fb75a 100644[m
+[1m--- a/src/version.cpp[m
+[1m+++ b/src/version.cpp[m
+[36m@@ -6,5 +6,4 @@[m [mstd::string_view version() {[m
+   return "0.1.0";[m
+ }[m
+ [m
+[31m-}  // namespace helios[m
+[31m-[m
+[32m+[m[32m} // namespace helios[m
+[1mdiff --git a/tests/cpp/resources_test.cpp b/tests/cpp/resources_test.cpp[m
+[1mindex 6d78d76..8823405 100644[m
+[1m--- a/tests/cpp/resources_test.cpp[m
+[1m+++ b/tests/cpp/resources_test.cpp[m
+[36m@@ -86,7 +86,7 @@[m [mvoid different_memory_values_compare_unequal() {[m
+   assert(!(first == second));[m
+ }[m
+ [m
+[31m-}  // namespace[m
+[32m+[m[32m} // namespace[m
+ [m
+ int main() {[m
+   valid_resources_pass_validation();[m
+[1mdiff --git a/tests/cpp/smoke_test.cpp b/tests/cpp/smoke_test.cpp[m
+[1mindex 5c1a184..6baed7b 100644[m
+[1m--- a/tests/cpp/smoke_test.cpp[m
+[1m+++ b/tests/cpp/smoke_test.cpp[m
+[36m@@ -6,4 +6,3 @@[m [mint main() {[m
+   assert(!helios::version().empty());[m
+   return 0;[m
+ }[m
+[31m-[m

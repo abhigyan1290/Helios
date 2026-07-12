@@ -16,4 +16,4 @@ void validate_resources(const Resources& resources) {
   }
 }
 
-}  // namespace helios
+} // namespace helios

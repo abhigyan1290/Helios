@@ -21,4 +21,4 @@ void validate_job(const Job& job) {
   }
 }
 
-}  // namespace helios
+} // namespace helios

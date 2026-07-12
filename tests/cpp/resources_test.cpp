@@ -86,7 +86,7 @@ void different_memory_values_compare_unequal() {
   assert(!(first == second));
 }
 
-}  // namespace
+} // namespace
 
 int main() {
   valid_resources_pass_validation();
