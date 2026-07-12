@@ -13,5 +13,9 @@ struct Resources {
 };
 
 void validate_resources(const Resources& resources);
+bool less_equal(const Resources& lhs, const Resources& rhs);
+bool fits(const Resources& available, const Resources& requested);
+Resources allocate(const Resources& available, const Resources& requested);
+Resources release(const Resources& available, const Resources& total, const Resources& released);
 
 } // namespace helios
