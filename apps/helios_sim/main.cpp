@@ -6,4 +6,3 @@ int main() {
   std::cout << "Helios simulator scaffold v" << helios::version() << '\n';
   return 0;
 }
-

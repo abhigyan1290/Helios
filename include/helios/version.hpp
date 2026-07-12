@@ -6,5 +6,4 @@ namespace helios {
 
 std::string_view version();
 
-}  // namespace helios
-
+} // namespace helios
