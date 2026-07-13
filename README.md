@@ -8,9 +8,9 @@ formatting rules, CI, and a tiny smoke test before implementing simulator logic.
 
 ## Current Status
 
-- Milestone 1 in progress: project scaffolding and CI.
-- C++ simulator logic has not been implemented yet.
-- Python bindings, Gymnasium environment, and PPO training are planned future milestones.
+- Milestone 1 scaffold is complete.
+- Phase 2 now has basic C++ job/resource model primitives.
+- Scheduler/event simulation is still future work.
 
 ## Planned Stack
 
