@@ -18,6 +18,7 @@ add_library(
   src/job_state.cpp
   src/resources.cpp
   src/schedule_decision.cpp
+  src/schedulers/fifo_scheduler.cpp
   src/simulator_state.cpp
   src/version.cpp
 )
@@ -55,3 +56,7 @@ add_test(NAME helios_simulator_state_test COMMAND helios_simulator_state_test)
 add_executable(helios_schedule_decision_test tests/cpp/schedule_decision_test.cpp)
 target_link_libraries(helios_schedule_decision_test PRIVATE helios_core)
 add_test(NAME helios_schedule_decision_test COMMAND helios_schedule_decision_test)
+
+add_executable(helios_fifo_scheduler_test tests/cpp/fifo_scheduler_test.cpp)
+target_link_libraries(helios_fifo_scheduler_test PRIVATE helios_core)
+add_test(NAME helios_fifo_scheduler_test COMMAND helios_fifo_scheduler_test)
