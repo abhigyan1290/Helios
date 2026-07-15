@@ -16,11 +16,14 @@ add_library(
   src/event.cpp
   src/job.cpp
   src/job_state.cpp
+  src/metrics.cpp
   src/resources.cpp
   src/schedule_decision.cpp
   src/schedulers/fifo_scheduler.cpp
+  src/simulation_runner.cpp
   src/simulator_state.cpp
   src/version.cpp
+  src/workload.cpp
 )
 target_include_directories(helios_core PUBLIC include)
 
@@ -60,3 +63,15 @@ add_test(NAME helios_schedule_decision_test COMMAND helios_schedule_decision_tes
 add_executable(helios_fifo_scheduler_test tests/cpp/fifo_scheduler_test.cpp)
 target_link_libraries(helios_fifo_scheduler_test PRIVATE helios_core)
 add_test(NAME helios_fifo_scheduler_test COMMAND helios_fifo_scheduler_test)
+
+add_executable(helios_workload_test tests/cpp/workload_test.cpp)
+target_link_libraries(helios_workload_test PRIVATE helios_core)
+add_test(NAME helios_workload_test COMMAND helios_workload_test)
+
+add_executable(helios_metrics_test tests/cpp/metrics_test.cpp)
+target_link_libraries(helios_metrics_test PRIVATE helios_core)
+add_test(NAME helios_metrics_test COMMAND helios_metrics_test)
+
+add_executable(helios_simulation_runner_test tests/cpp/simulation_runner_test.cpp)
+target_link_libraries(helios_simulation_runner_test PRIVATE helios_core)
+add_test(NAME helios_simulation_runner_test COMMAND helios_simulation_runner_test)
