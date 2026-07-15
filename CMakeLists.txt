@@ -13,6 +13,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_library(
   helios_core
+  src/csv.cpp
+  src/demo_workloads.cpp
   src/event.cpp
   src/job.cpp
   src/job_state.cpp
@@ -75,3 +77,11 @@ add_test(NAME helios_metrics_test COMMAND helios_metrics_test)
 add_executable(helios_simulation_runner_test tests/cpp/simulation_runner_test.cpp)
 target_link_libraries(helios_simulation_runner_test PRIVATE helios_core)
 add_test(NAME helios_simulation_runner_test COMMAND helios_simulation_runner_test)
+
+add_executable(helios_csv_test tests/cpp/csv_test.cpp)
+target_link_libraries(helios_csv_test PRIVATE helios_core)
+add_test(NAME helios_csv_test COMMAND helios_csv_test)
+
+add_executable(helios_demo_workloads_test tests/cpp/demo_workloads_test.cpp)
+target_link_libraries(helios_demo_workloads_test PRIVATE helios_core)
+add_test(NAME helios_demo_workloads_test COMMAND helios_demo_workloads_test)
