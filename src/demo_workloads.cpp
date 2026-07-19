@@ -1,6 +1,7 @@
 #include "helios/demo_workloads.hpp"
 
 #include <stdexcept>
+#include <vector>
 
 namespace helios {
 
@@ -55,6 +56,29 @@ Workload gpu_contention_workload() {
   });
 }
 
+Workload large_varied_100_workload() {
+  std::vector<Job> jobs;
+  jobs.reserve(100);
+
+  for (int wave = 0; wave < 10; ++wave) {
+    const auto base_id = static_cast<JobId>(wave * 10 + 1);
+    const auto base_time = static_cast<SimTime>(wave * 6);
+
+    jobs.push_back(make_job(base_id, base_time, 18 + (wave % 3), 4, 16, 32768));
+    jobs.push_back(make_job(base_id + 1, base_time, 2 + (wave % 2), 1, 4, 8192));
+    jobs.push_back(make_job(base_id + 2, base_time, 3, 1, 4, 8192));
+    jobs.push_back(make_job(base_id + 3, base_time + 1, 5, 2, 8, 16384));
+    jobs.push_back(make_job(base_id + 4, base_time + 1, 1, 1, 2, 4096));
+    jobs.push_back(make_job(base_id + 5, base_time + 2, 7, 2, 8, 16384));
+    jobs.push_back(make_job(base_id + 6, base_time + 2, 2, 1, 4, 8192));
+    jobs.push_back(make_job(base_id + 7, base_time + 3, 4, 1, 4, 8192));
+    jobs.push_back(make_job(base_id + 8, base_time + 4, 9, 3, 12, 24576));
+    jobs.push_back(make_job(base_id + 9, base_time + 5, 1, 1, 2, 4096));
+  }
+
+  return make_workload(std::move(jobs));
+}
+
 } // namespace
 
 std::vector<DemoWorkloadSpec> demo_workload_specs() {
@@ -74,6 +98,10 @@ std::vector<DemoWorkloadSpec> demo_workload_specs() {
       DemoWorkloadSpec{
           .name = "gpu-contention",
           .description = "multiple GPU-heavy jobs create resource contention",
+      },
+      DemoWorkloadSpec{
+          .name = "large-varied-100",
+          .description = "100 mixed jobs with staggered arrivals and varied resource requests",
       },
   };
 }
@@ -98,6 +126,9 @@ Workload make_demo_workload(std::string_view name) {
   }
   if (name == "gpu-contention") {
     return gpu_contention_workload();
+  }
+  if (name == "large-varied-100") {
+    return large_varied_100_workload();
   }
 
   throw std::invalid_argument("unknown demo workload");

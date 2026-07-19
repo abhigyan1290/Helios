@@ -22,6 +22,7 @@ add_library(
   src/resources.cpp
   src/schedule_decision.cpp
   src/schedulers/fifo_scheduler.cpp
+  src/schedulers/sjf_scheduler.cpp
   src/simulation_runner.cpp
   src/simulator_state.cpp
   src/version.cpp
@@ -65,6 +66,10 @@ add_test(NAME helios_schedule_decision_test COMMAND helios_schedule_decision_tes
 add_executable(helios_fifo_scheduler_test tests/cpp/fifo_scheduler_test.cpp)
 target_link_libraries(helios_fifo_scheduler_test PRIVATE helios_core)
 add_test(NAME helios_fifo_scheduler_test COMMAND helios_fifo_scheduler_test)
+
+add_executable(helios_sjf_scheduler_test tests/cpp/sjf_scheduler_test.cpp)
+target_link_libraries(helios_sjf_scheduler_test PRIVATE helios_core)
+add_test(NAME helios_sjf_scheduler_test COMMAND helios_sjf_scheduler_test)
 
 add_executable(helios_workload_test tests/cpp/workload_test.cpp)
 target_link_libraries(helios_workload_test PRIVATE helios_core)

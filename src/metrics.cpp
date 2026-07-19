@@ -1,6 +1,7 @@
 #include "helios/metrics.hpp"
 
 #include <algorithm>
+#include <numeric>
 
 namespace helios {
 
@@ -46,6 +47,20 @@ SimulationResult make_simulation_result(std::vector<CompletedJob> completed_jobs
       .jobs = std::move(job_metrics),
       .makespan = makespan,
   };
+}
+
+SimTime total_wait_time(const SimulationResult& result) {
+  return std::accumulate(
+      result.jobs.begin(), result.jobs.end(), SimTime{0},
+      [](SimTime total, const JobMetrics& metrics) { return total + metrics.wait_time; });
+}
+
+double average_wait_time(const SimulationResult& result) {
+  if (result.jobs.empty()) {
+    return 0.0;
+  }
+
+  return static_cast<double>(total_wait_time(result)) / static_cast<double>(result.jobs.size());
 }
 
 } // namespace helios

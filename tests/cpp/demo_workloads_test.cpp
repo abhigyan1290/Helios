@@ -54,6 +54,27 @@ void staggered_arrivals_start_after_time_zero() {
   assert(workload.jobs.front().arrival_time > 0);
 }
 
+void large_varied_workload_has_mixed_job_shapes() {
+  const auto workload = helios::make_demo_workload("large-varied-100");
+
+  bool has_later_arrival = false;
+  bool has_one_gpu_job = false;
+  bool has_full_cluster_job = false;
+
+  assert(workload.jobs.size() == 100);
+
+  for (const auto& job : workload.jobs) {
+    has_later_arrival = has_later_arrival || job.arrival_time > 0;
+    has_one_gpu_job = has_one_gpu_job || job.request.gpu_count == 1;
+    has_full_cluster_job =
+        has_full_cluster_job || job.request.gpu_count == helios::demo_cluster_resources().gpu_count;
+  }
+
+  assert(has_later_arrival);
+  assert(has_one_gpu_job);
+  assert(has_full_cluster_job);
+}
+
 } // namespace
 
 int main() {
@@ -63,6 +84,7 @@ int main() {
   unknown_demo_workload_is_rejected();
   fifo_blocking_workload_has_full_cluster_head_job();
   staggered_arrivals_start_after_time_zero();
+  large_varied_workload_has_mixed_job_shapes();
 
   return 0;
 }

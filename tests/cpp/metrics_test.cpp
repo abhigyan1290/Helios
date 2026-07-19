@@ -104,6 +104,33 @@ void completed_jobs_are_ordered_by_completion_time_then_id() {
   assert(result.jobs[2].job_id == 3);
 }
 
+void total_wait_time_sums_job_wait_times() {
+  const auto result = helios::make_simulation_result({
+      completed_job(1, 0, 0, 5),
+      completed_job(2, 0, 5, 3),
+      completed_job(3, 2, 8, 1),
+  });
+
+  assert(helios::total_wait_time(result) == 11);
+}
+
+void average_wait_time_divides_by_job_count() {
+  const auto result = helios::make_simulation_result({
+      completed_job(1, 0, 0, 5),
+      completed_job(2, 0, 5, 3),
+      completed_job(3, 2, 8, 1),
+  });
+
+  assert(helios::average_wait_time(result) == 11.0 / 3.0);
+}
+
+void empty_average_wait_time_is_zero() {
+  const auto result = helios::make_simulation_result({});
+
+  assert(helios::total_wait_time(result) == 0);
+  assert(helios::average_wait_time(result) == 0.0);
+}
+
 } // namespace
 
 int main() {
@@ -115,6 +142,9 @@ int main() {
   empty_simulation_result_has_makespan_zero();
   makespan_is_absolute_simulation_end_time();
   completed_jobs_are_ordered_by_completion_time_then_id();
+  total_wait_time_sums_job_wait_times();
+  average_wait_time_divides_by_job_count();
+  empty_average_wait_time_is_zero();
 
   return 0;
 }

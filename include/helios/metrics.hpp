@@ -27,5 +27,7 @@ struct SimulationResult {
 
 JobMetrics make_job_metrics(const CompletedJob& completed_job);
 SimulationResult make_simulation_result(std::vector<CompletedJob> completed_jobs);
+SimTime total_wait_time(const SimulationResult& result);
+double average_wait_time(const SimulationResult& result);
 
 } // namespace helios

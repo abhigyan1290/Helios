@@ -2,6 +2,7 @@
 
 #include "helios/schedule_decision.hpp"
 #include "helios/schedulers/fifo_scheduler.hpp"
+#include "helios/schedulers/sjf_scheduler.hpp"
 #include "helios/simulator_state.hpp"
 
 #include <algorithm>
@@ -87,15 +88,6 @@ std::optional<SimTime> min_time(std::optional<SimTime> lhs, std::optional<SimTim
 
 std::optional<SimTime> next_relevant_future_time(const SimulatorState& state) {
   const auto next_completion = next_running_completion_time(state);
-  const auto schedulable_jobs = get_schedulable_jobs(state);
-
-  if (!schedulable_jobs.empty()) {
-    const auto& head_job = schedulable_jobs.front();
-    if (!fits(state.available_resources, head_job.request)) {
-      return next_completion;
-    }
-  }
-
   return min_time(next_completion, next_pending_arrival_time(state));
 }
 
@@ -110,11 +102,12 @@ SimulatorState complete_due_jobs(SimulatorState state) {
   }
 }
 
-SimulatorState start_fifo_jobs(SimulatorState state, bool& started_any) {
+SimulatorState start_scheduler_jobs(SimulatorState state, const SchedulerFn& scheduler,
+                                    bool& started_any) {
   started_any = false;
 
   while (true) {
-    const auto decision = fifo_schedule(state);
+    const auto decision = scheduler(state);
     if (!decision.job_id.has_value()) {
       return state;
     }
@@ -130,7 +123,12 @@ bool is_finished(const SimulatorState& state) {
 
 } // namespace
 
-SimulationResult run_fifo_simulation(const Workload& workload, Resources total_resources) {
+SimulationResult run_simulation(const Workload& workload, Resources total_resources,
+                                SchedulerFn scheduler) {
+  if (!scheduler) {
+    throw std::invalid_argument("scheduler function must be provided");
+  }
+
   validate_workload(workload);
   validate_resources(total_resources);
   reject_unschedulable_jobs(workload, total_resources);
@@ -144,7 +142,7 @@ SimulationResult run_fifo_simulation(const Workload& workload, Resources total_r
     state = complete_due_jobs(state);
 
     bool started_any = false;
-    state = start_fifo_jobs(state, started_any);
+    state = start_scheduler_jobs(state, scheduler, started_any);
 
     if (is_finished(state)) {
       break;
@@ -163,6 +161,14 @@ SimulationResult run_fifo_simulation(const Workload& workload, Resources total_r
   }
 
   return make_simulation_result(state.completed_jobs);
+}
+
+SimulationResult run_fifo_simulation(const Workload& workload, Resources total_resources) {
+  return run_simulation(workload, total_resources, fifo_schedule);
+}
+
+SimulationResult run_sjf_simulation(const Workload& workload, Resources total_resources) {
+  return run_simulation(workload, total_resources, sjf_schedule);
 }
 
 } // namespace helios
