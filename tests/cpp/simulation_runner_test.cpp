@@ -1,5 +1,7 @@
 #include "helios/simulation_runner.hpp"
 
+#include "helios/schedulers/fifo_scheduler.hpp"
+
 #include <cassert>
 #include <stdexcept>
 
@@ -57,6 +59,16 @@ template <typename Function> void expect_runtime_error_from(Function function) {
   }
 
   assert(false && "expected std::runtime_error");
+}
+
+template <typename Function> void expect_invalid_argument_from(Function function) {
+  try {
+    function();
+  } catch (const std::invalid_argument&) {
+    return;
+  }
+
+  assert(false && "expected std::invalid_argument");
 }
 
 void empty_workload_completes_with_empty_result() {
@@ -191,6 +203,23 @@ void runner_is_deterministic() {
          helios::run_fifo_simulation(workload, total_resources()));
 }
 
+void generic_runner_with_fifo_matches_fifo_wrapper() {
+  const auto workload = helios::make_workload({
+      small_job(2, 3, 4),
+      full_cluster_job(1, 0, 5),
+      small_job(3, 4, 2),
+  });
+
+  assert(helios::run_simulation(workload, total_resources(), helios::fifo_schedule) ==
+         helios::run_fifo_simulation(workload, total_resources()));
+}
+
+void empty_scheduler_function_is_rejected() {
+  expect_invalid_argument_from([] {
+    helios::run_simulation(helios::make_workload({}), total_resources(), helios::SchedulerFn{});
+  });
+}
+
 void metrics_order_by_completion_time_then_job_id() {
   const auto result = helios::run_fifo_simulation(helios::make_workload({
                                                       small_job(2, 0, 5),
@@ -217,6 +246,8 @@ int main() {
   later_jobs_are_not_started_before_arrival();
   same_time_arrivals_start_in_job_id_order();
   runner_is_deterministic();
+  generic_runner_with_fifo_matches_fifo_wrapper();
+  empty_scheduler_function_is_rejected();
   metrics_order_by_completion_time_then_job_id();
 
   return 0;
