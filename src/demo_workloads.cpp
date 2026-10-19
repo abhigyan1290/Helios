@@ -1,4 +1,5 @@
 #include "helios/demo_workloads.hpp"
+#include "helios/workload_generator.hpp"
 
 #include <stdexcept>
 #include <vector>
@@ -79,6 +80,25 @@ Workload large_varied_100_workload() {
   return make_workload(std::move(jobs));
 }
 
+Workload generated_profile(int job_count, unsigned int seed, SimTime max_arrival_time,
+                           ResourceAmount min_gpu_count = 1) {
+  return generate_workload(
+      WorkloadGeneratorConfig{
+          .job_count = job_count,
+          .seed = seed,
+          .max_arrival_time = max_arrival_time,
+          .min_duration = 1,
+          .max_duration = 20,
+          .min_gpu_count = min_gpu_count,
+          .max_gpu_count = 4,
+          .min_cpu_count = 2,
+          .max_cpu_count = 16,
+          .min_memory_mb = 4096,
+          .max_memory_mb = 32768,
+      },
+      demo_cluster_resources());
+}
+
 } // namespace
 
 std::vector<DemoWorkloadSpec> demo_workload_specs() {
@@ -102,6 +122,26 @@ std::vector<DemoWorkloadSpec> demo_workload_specs() {
       DemoWorkloadSpec{
           .name = "large-varied-100",
           .description = "100 mixed jobs with staggered arrivals and varied resource requests",
+      },
+      DemoWorkloadSpec{
+          .name = "generated-small",
+          .description = "25 seeded jobs arriving between times 0 and 50",
+      },
+      DemoWorkloadSpec{
+          .name = "generated-medium",
+          .description = "100 seeded jobs arriving between times 0 and 100",
+      },
+      DemoWorkloadSpec{
+          .name = "generated-large",
+          .description = "500 seeded jobs arriving between times 0 and 500",
+      },
+      DemoWorkloadSpec{
+          .name = "generated-bursty",
+          .description = "100 seeded jobs concentrated between times 0 and 3",
+      },
+      DemoWorkloadSpec{
+          .name = "generated-gpu-heavy",
+          .description = "100 seeded jobs each requesting 2 to 4 GPUs",
       },
   };
 }
@@ -129,6 +169,21 @@ Workload make_demo_workload(std::string_view name) {
   }
   if (name == "large-varied-100") {
     return large_varied_100_workload();
+  }
+  if (name == "generated-small") {
+    return generated_profile(25, 701, 50);
+  }
+  if (name == "generated-medium") {
+    return generated_profile(100, 702, 100);
+  }
+  if (name == "generated-large") {
+    return generated_profile(500, 703, 500);
+  }
+  if (name == "generated-bursty") {
+    return generated_profile(100, 704, 3);
+  }
+  if (name == "generated-gpu-heavy") {
+    return generated_profile(100, 705, 100, 2);
   }
 
   throw std::invalid_argument("unknown demo workload");
