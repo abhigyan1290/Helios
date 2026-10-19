@@ -1,10 +1,13 @@
+#include "helios/benchmark_suite.hpp"
 #include "helios/csv.hpp"
 #include "helios/demo_workloads.hpp"
 #include "helios/metrics.hpp"
 #include "helios/simulation_runner.hpp"
 #include "helios/version.hpp"
 
+#include <iomanip>
 #include <iostream>
+#include <limits>
 #include <string_view>
 
 namespace {
@@ -23,6 +26,17 @@ void print_comparison_row(std::string_view scheduler_name, const helios::Simulat
 } // namespace
 
 int main(int argc, char* argv[]) {
+  if (argc == 2 && std::string_view{argv[1]} == "--compare-suite") {
+    const auto summaries = helios::compare_generated_suite();
+    std::cout << std::setprecision(std::numeric_limits<double>::max_digits10);
+    std::cout << "workload,scheduler,job_count,makespan,total_wait_time,average_wait_time\n";
+    for (const auto& summary : summaries) {
+      std::cout << summary.workload_name << ',' << summary.scheduler_name << ','
+                << summary.job_count << ',' << summary.makespan << ',' << summary.total_wait_time
+                << ',' << summary.average_wait_time << '\n';
+    }
+    return 0;
+  }
   if (argc == 2 && std::string_view{argv[1]} == "--list-demo-workloads") {
     print_demo_workloads();
     return 0;
@@ -60,5 +74,6 @@ int main(int argc, char* argv[]) {
   std::cout << "Run with --demo-fifo [workload-name] to print a deterministic FIFO CSV.\n";
   std::cout << "Run with --demo-sjf [workload-name] to print a deterministic SJF CSV.\n";
   std::cout << "Run with --compare <workload-name> to compare FIFO and SJF metrics.\n";
+  std::cout << "Run with --compare-suite to compare all generated profiles as CSV.\n";
   return 0;
 }

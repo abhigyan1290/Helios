@@ -1,0 +1,11 @@
+workload,scheduler,job_count,makespan,total_wait_time,average_wait_time
+generated-small,fifo,25,208,1788,71.519999999999996
+generated-small,sjf,25,207,1005,40.200000000000003
+generated-medium,fifo,100,712,28168,281.68000000000001
+generated-medium,sjf,100,649,14000,140
+generated-large,fifo,500,3976,843925,1687.8499999999999
+generated-large,sjf,500,3478,383386,766.77200000000005
+generated-bursty,fifo,100,824,37567,375.67000000000002
+generated-bursty,sjf,100,714,20546,205.46000000000001
+generated-gpu-heavy,fifo,100,932,44044,440.44
+generated-gpu-heavy,sjf,100,833,23565,235.65000000000001

@@ -13,6 +13,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_library(
   helios_core
+  src/benchmark_suite.cpp
   src/csv.cpp
   src/demo_workloads.cpp
   src/event.cpp
@@ -27,6 +28,7 @@ add_library(
   src/simulator_state.cpp
   src/version.cpp
   src/workload.cpp
+  src/workload_generator.cpp
 )
 target_include_directories(helios_core PUBLIC include)
 
@@ -34,6 +36,10 @@ add_executable(helios_sim apps/helios_sim/main.cpp)
 target_link_libraries(helios_sim PRIVATE helios_core)
 
 enable_testing()
+
+add_executable(helios_benchmark_suite_test tests/cpp/benchmark_suite_test.cpp)
+target_link_libraries(helios_benchmark_suite_test PRIVATE helios_core)
+add_test(NAME helios_benchmark_suite_test COMMAND helios_benchmark_suite_test)
 
 add_executable(helios_smoke_test tests/cpp/smoke_test.cpp)
 target_link_libraries(helios_smoke_test PRIVATE helios_core)
@@ -74,6 +80,10 @@ add_test(NAME helios_sjf_scheduler_test COMMAND helios_sjf_scheduler_test)
 add_executable(helios_workload_test tests/cpp/workload_test.cpp)
 target_link_libraries(helios_workload_test PRIVATE helios_core)
 add_test(NAME helios_workload_test COMMAND helios_workload_test)
+
+add_executable(helios_workload_generator_test tests/cpp/workload_generator_test.cpp)
+target_link_libraries(helios_workload_generator_test PRIVATE helios_core)
+add_test(NAME helios_workload_generator_test COMMAND helios_workload_generator_test)
 
 add_executable(helios_metrics_test tests/cpp/metrics_test.cpp)
 target_link_libraries(helios_metrics_test PRIVATE helios_core)
