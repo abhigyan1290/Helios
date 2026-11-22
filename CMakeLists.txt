@@ -37,6 +37,16 @@ add_library(
 )
 target_include_directories(helios_core PUBLIC include)
 
+option(HELIOS_BUILD_PYTHON "Build the Python simulator bindings" OFF)
+if(HELIOS_BUILD_PYTHON)
+  find_package(Python 3.11 COMPONENTS Interpreter Development.Module REQUIRED)
+  find_package(pybind11 CONFIG REQUIRED)
+  set_target_properties(helios_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
+  pybind11_add_module(_core python/bindings.cpp)
+  target_link_libraries(_core PRIVATE helios_core)
+  install(TARGETS _core LIBRARY DESTINATION helios RUNTIME DESTINATION helios)
+endif()
+
 add_executable(helios_sim apps/helios_sim/main.cpp)
 target_link_libraries(helios_sim PRIVATE helios_core)
 

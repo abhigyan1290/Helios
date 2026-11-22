@@ -22,7 +22,8 @@ It exports metrics as CSV, with Python scripts for plotting the results.
 - Milestone 9 separates optional runtime estimates from actual execution durations.
 - Milestone 10 adds seeded random and estimated EASY-style backfilling baselines.
 - Milestone 11 adds `Simulator::reset`, `observe`, `step`, `done`, and terminal results.
-- Python bindings, Gymnasium, and RL training are future work.
+- Phase 11 exposes the interactive C++ simulator to Python; Gymnasium and RL
+  training remain future work.
 
 ## Current Capabilities
 
@@ -400,7 +401,40 @@ C++ tests cover batch/interactive equivalence, action rejection without state
 mutation, observation leakage, seed reset, estimate errors, and reservation edge
 cases. Assertions remain enabled in Release tests. The optional scale test now
 checks all five policies through 12,000 jobs, replaying every job's resource usage.
-Python bindings are the next milestone; Gymnasium and training follow afterward.
+## Python Simulator API
+
+Python 3.11+, a C++20 compiler, CMake, and Ninja are required. From the project
+root, create a virtual environment and install the package:
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -e .
+.venv/bin/python -m pip install -r tests/python/requirements.txt
+.venv/bin/python -m pytest tests/python
+```
+
+The install builds the pybind11 extension via CMake. The regular C++ build does
+not require Python or pybind11; `HELIOS_BUILD_PYTHON` defaults to `OFF`.
+Reinstall the editable package after changing C++ binding or simulator code.
+
+```python
+from helios import Job, Resources, Simulator, Workload, no_schedule_decision, select_job
+
+cluster = Resources(gpu_count=1, cpu_count=4, memory_mb=1024)
+request = Resources(gpu_count=1, cpu_count=1, memory_mb=128)
+sim = Simulator(Workload([Job(1, 0, 5, request, estimated_duration=6)]), cluster)
+observation = sim.observe()
+sim.step(select_job(observation.pending_jobs[0].id))
+sim.step(no_schedule_decision())
+print(sim.result().makespan)  # 5
+```
+
+Observations are snapshots and omit actual duration and future jobs. Input jobs
+and terminal results do contain actual durations, so keep those separate from
+agent observations. A start does not advance time; a no-decision step advances
+to the next event. `result()` is available only after termination. C++ invalid
+argument errors become Python `ValueError`; runtime errors become `RuntimeError`.
+The binding does not yet define Gymnasium spaces, rewards, or training.
 
 ## Format
 
@@ -438,7 +472,7 @@ scripts/           Formatting and benchmark plotting scripts
 - Benchmarks cover 10 seeds per profile on one cluster size; broader workload
   distributions, realistic runtime predictors, and fairness policies remain future work.
 - Exact generated samples can differ between C++ standard library implementations.
-- No Python bindings, Gymnasium environment, PPO training, or dashboards yet.
+- No Gymnasium environment, PPO training, or dashboards yet.
 
 ## Development Workflow
 
