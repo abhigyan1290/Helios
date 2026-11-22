@@ -20,8 +20,6 @@ bool sjf_job_less(const Job& lhs, const Job& rhs) {
 } // namespace
 
 ScheduleDecision sjf_schedule(const SimulatorState& state) {
-  validate_simulator_state(state);
-
   auto schedulable_jobs = get_schedulable_jobs(state);
   schedulable_jobs.erase(std::remove_if(schedulable_jobs.begin(), schedulable_jobs.end(),
                                         [&state](const Job& job) {

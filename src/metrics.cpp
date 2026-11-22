@@ -49,10 +49,10 @@ SimulationResult make_simulation_result(std::vector<CompletedJob> completed_jobs
   };
 }
 
-SimTime total_wait_time(const SimulationResult& result) {
+AggregateTime total_wait_time(const SimulationResult& result) {
   return std::accumulate(
-      result.jobs.begin(), result.jobs.end(), SimTime{0},
-      [](SimTime total, const JobMetrics& metrics) { return total + metrics.wait_time; });
+      result.jobs.begin(), result.jobs.end(), AggregateTime{0},
+      [](AggregateTime total, const JobMetrics& metrics) { return total + metrics.wait_time; });
 }
 
 double average_wait_time(const SimulationResult& result) {
@@ -61,6 +61,29 @@ double average_wait_time(const SimulationResult& result) {
   }
 
   return static_cast<double>(total_wait_time(result)) / static_cast<double>(result.jobs.size());
+}
+
+SimTime max_wait_time(const SimulationResult& result) {
+  SimTime maximum = 0;
+  for (const auto& job : result.jobs) {
+    maximum = std::max(maximum, job.wait_time);
+  }
+  return maximum;
+}
+
+SimTime p95_wait_time(const SimulationResult& result) {
+  if (result.jobs.empty()) {
+    return 0;
+  }
+  std::vector<SimTime> waits;
+  waits.reserve(result.jobs.size());
+  for (const auto& job : result.jobs) {
+    waits.push_back(job.wait_time);
+  }
+  // n - floor(n / 20) equals ceil(0.95 * n), without floating-point rounding.
+  const auto index = waits.size() - waits.size() / 20 - 1;
+  std::nth_element(waits.begin(), waits.begin() + index, waits.end());
+  return waits[index];
 }
 
 } // namespace helios

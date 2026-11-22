@@ -129,6 +129,33 @@ void generated_profiles_are_repeatable_and_complete() {
   }
 }
 
+void explicit_seeds_preserve_profile_settings_and_default_workloads() {
+  const std::array defaults{
+      std::pair{"generated-small", 701U},     std::pair{"generated-medium", 702U},
+      std::pair{"generated-large", 703U},     std::pair{"generated-bursty", 704U},
+      std::pair{"generated-gpu-heavy", 705U},
+  };
+  for (const auto& [name, seed] : defaults) {
+    assert(helios::make_demo_workload(name) == helios::make_generated_workload(name, seed));
+    auto first = helios::generated_workload_config(name, 0);
+    auto second = helios::generated_workload_config(name, 42);
+    first.seed = second.seed;
+    assert(first == second);
+  }
+  for (const auto& spec : helios::scale_workload_specs()) {
+    const auto config = helios::generated_workload_config(spec.name, 42);
+    const auto workload = helios::make_generated_workload(spec.name, 42);
+    assert(workload.jobs.size() == static_cast<std::size_t>(config.job_count));
+    assert(config.job_count >= 1000);
+    assert(config.max_arrival_time == config.job_count);
+    helios::validate_workload(workload);
+    for (const auto& job : workload.jobs) {
+      assert(helios::fits(helios::demo_cluster_resources(), job.request));
+    }
+  }
+  assert(helios::make_generated_workload("scale-12000", 0).jobs.size() == 12000);
+}
+
 } // namespace
 
 int main() {
@@ -140,6 +167,7 @@ int main() {
   staggered_arrivals_start_after_time_zero();
   large_varied_workload_has_mixed_job_shapes();
   generated_profiles_are_repeatable_and_complete();
+  explicit_seeds_preserve_profile_settings_and_default_workloads();
 
   return 0;
 }

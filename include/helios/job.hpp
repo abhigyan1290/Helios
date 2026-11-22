@@ -2,6 +2,8 @@
 
 #include "helios/resources.hpp"
 
+#include <optional>
+
 namespace helios {
 
 using JobId = int;
@@ -13,6 +15,7 @@ struct Job {
   SimTime arrival_time;
   Duration duration;
   Resources request;
+  std::optional<Duration> estimated_duration = std::nullopt;
 
   bool operator==(const Job&) const = default;
 };

@@ -1,5 +1,6 @@
 #include "helios/job_state.hpp"
 
+#include <limits>
 #include <stdexcept>
 
 namespace helios {
@@ -9,6 +10,9 @@ void validate_running_job(const RunningJob& running_job) {
 
   if (running_job.start_time < running_job.job.arrival_time) {
     throw std::invalid_argument("running job start time cannot be before arrival time");
+  }
+  if (running_job.start_time > std::numeric_limits<SimTime>::max() - running_job.job.duration) {
+    throw std::invalid_argument("running job completion time overflows simulation time");
   }
   if (running_job.completion_time != running_job.start_time + running_job.job.duration) {
     throw std::invalid_argument("running job completion time must equal start time plus duration");
@@ -21,6 +25,9 @@ void validate_completed_job(const CompletedJob& completed_job) {
   if (completed_job.start_time < completed_job.job.arrival_time) {
     throw std::invalid_argument("completed job start time cannot be before arrival time");
   }
+  if (completed_job.start_time > std::numeric_limits<SimTime>::max() - completed_job.job.duration) {
+    throw std::invalid_argument("completed job completion time overflows simulation time");
+  }
   if (completed_job.completion_time != completed_job.start_time + completed_job.job.duration) {
     throw std::invalid_argument(
         "completed job completion time must equal start time plus duration");
@@ -32,6 +39,9 @@ RunningJob start_runtime_job(const Job& job, SimTime start_time) {
 
   if (start_time < job.arrival_time) {
     throw std::runtime_error("job cannot start before arrival time");
+  }
+  if (start_time > std::numeric_limits<SimTime>::max() - job.duration) {
+    throw std::runtime_error("job completion time overflows simulation time");
   }
 
   return RunningJob{

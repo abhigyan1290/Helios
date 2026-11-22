@@ -2,9 +2,12 @@
 
 #include "helios/job_state.hpp"
 
+#include <cstdint>
 #include <vector>
 
 namespace helios {
+
+using AggregateTime = std::int64_t;
 
 struct JobMetrics {
   JobId job_id;
@@ -27,7 +30,10 @@ struct SimulationResult {
 
 JobMetrics make_job_metrics(const CompletedJob& completed_job);
 SimulationResult make_simulation_result(std::vector<CompletedJob> completed_jobs);
-SimTime total_wait_time(const SimulationResult& result);
+AggregateTime total_wait_time(const SimulationResult& result);
 double average_wait_time(const SimulationResult& result);
+SimTime max_wait_time(const SimulationResult& result);
+// Nearest rank: ceil(0.95 * job count), one-based. Empty results return zero.
+SimTime p95_wait_time(const SimulationResult& result);
 
 } // namespace helios

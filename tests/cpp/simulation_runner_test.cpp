@@ -220,6 +220,19 @@ void empty_scheduler_function_is_rejected() {
   });
 }
 
+void batch_initialization_preserves_fifo_order_for_unsorted_workloads() {
+  const helios::Workload workload{
+      .jobs = {small_job(3, 20, 1), small_job(2, 0, 1), full_cluster_job(1, 0, 10)},
+  };
+  const auto original = workload;
+  const auto result = helios::run_fifo_simulation(workload, total_resources());
+  assert(result.jobs.size() == 3);
+  assert(result.jobs[0].job_id == 1 && result.jobs[0].start_time == 0);
+  assert(result.jobs[1].job_id == 2 && result.jobs[1].start_time == 10);
+  assert(result.jobs[2].job_id == 3 && result.jobs[2].start_time == 20);
+  assert(workload == original);
+}
+
 void metrics_order_by_completion_time_then_job_id() {
   const auto result = helios::run_fifo_simulation(helios::make_workload({
                                                       small_job(2, 0, 5),
@@ -248,6 +261,7 @@ int main() {
   runner_is_deterministic();
   generic_runner_with_fifo_matches_fifo_wrapper();
   empty_scheduler_function_is_rejected();
+  batch_initialization_preserves_fifo_order_for_unsorted_workloads();
   metrics_order_by_completion_time_then_job_id();
 
   return 0;

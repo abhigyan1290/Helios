@@ -1,0 +1,288 @@
+{
+  "command": [
+    "scripts/run_seeded_benchmarks.py",
+    "--workers",
+    "2",
+    "--output",
+    "benchmarks/generated_multiseed.csv"
+  ],
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "simulator": "/home/abhigyandoshi/Helios/build/release/helios_sim",
+  "simulator_sha256": "843ebcdd02f83c5024a15f3f18c8392d882647ef5e277804b787d674dc9a331d",
+  "seed_values": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "workers": 2,
+  "cluster": {
+    "gpu_count": 4,
+    "cpu_count": 32,
+    "memory_mb": 131072
+  },
+  "wait_metrics": {
+    "p95_wait_time": "Nearest rank ceil(0.95 * job_count), one-based",
+    "max_wait_time": "Largest per-job wait time"
+  },
+  "total_wall_seconds": 1.4710698970011435,
+  "timing_note": "Paired process wall time includes both schedulers and generation; concurrent workers share host resources. This is not simulated makespan.",
+  "pairs": [
+    {
+      "workload": "generated-small",
+      "seed": 0,
+      "paired_wall_seconds": 0.004763921999256127
+    },
+    {
+      "workload": "generated-small",
+      "seed": 1,
+      "paired_wall_seconds": 0.004144555001403205
+    },
+    {
+      "workload": "generated-small",
+      "seed": 2,
+      "paired_wall_seconds": 0.003686620999360457
+    },
+    {
+      "workload": "generated-small",
+      "seed": 3,
+      "paired_wall_seconds": 0.002987261992529966
+    },
+    {
+      "workload": "generated-small",
+      "seed": 4,
+      "paired_wall_seconds": 0.0034556949976831675
+    },
+    {
+      "workload": "generated-small",
+      "seed": 5,
+      "paired_wall_seconds": 0.002739167000981979
+    },
+    {
+      "workload": "generated-small",
+      "seed": 6,
+      "paired_wall_seconds": 0.002860624997993
+    },
+    {
+      "workload": "generated-small",
+      "seed": 7,
+      "paired_wall_seconds": 0.0028978129994357005
+    },
+    {
+      "workload": "generated-small",
+      "seed": 8,
+      "paired_wall_seconds": 0.003590392996557057
+    },
+    {
+      "workload": "generated-small",
+      "seed": 9,
+      "paired_wall_seconds": 0.0036698659969260916
+    },
+    {
+      "workload": "generated-medium",
+      "seed": 0,
+      "paired_wall_seconds": 0.013260881009045988
+    },
+    {
+      "workload": "generated-medium",
+      "seed": 1,
+      "paired_wall_seconds": 0.013785956994979642
+    },
+    {
+      "workload": "generated-medium",
+      "seed": 2,
+      "paired_wall_seconds": 0.015623805011273362
+    },
+    {
+      "workload": "generated-medium",
+      "seed": 3,
+      "paired_wall_seconds": 0.013470860998495482
+    },
+    {
+      "workload": "generated-medium",
+      "seed": 4,
+      "paired_wall_seconds": 0.014580244998796843
+    },
+    {
+      "workload": "generated-medium",
+      "seed": 5,
+      "paired_wall_seconds": 0.015610996997565962
+    },
+    {
+      "workload": "generated-medium",
+      "seed": 6,
+      "paired_wall_seconds": 0.014255325993872248
+    },
+    {
+      "workload": "generated-medium",
+      "seed": 7,
+      "paired_wall_seconds": 0.013790411001536995
+    },
+    {
+      "workload": "generated-medium",
+      "seed": 8,
+      "paired_wall_seconds": 0.015422746000695042
+    },
+    {
+      "workload": "generated-medium",
+      "seed": 9,
+      "paired_wall_seconds": 0.015650527988327667
+    },
+    {
+      "workload": "generated-large",
+      "seed": 0,
+      "paired_wall_seconds": 0.25784002301224973
+    },
+    {
+      "workload": "generated-large",
+      "seed": 1,
+      "paired_wall_seconds": 0.2577433729893528
+    },
+    {
+      "workload": "generated-large",
+      "seed": 2,
+      "paired_wall_seconds": 0.23153930099215358
+    },
+    {
+      "workload": "generated-large",
+      "seed": 3,
+      "paired_wall_seconds": 0.2501475410099374
+    },
+    {
+      "workload": "generated-large",
+      "seed": 4,
+      "paired_wall_seconds": 0.2581862369988812
+    },
+    {
+      "workload": "generated-large",
+      "seed": 5,
+      "paired_wall_seconds": 0.2270899519935483
+    },
+    {
+      "workload": "generated-large",
+      "seed": 6,
+      "paired_wall_seconds": 0.2451333929930115
+    },
+    {
+      "workload": "generated-large",
+      "seed": 7,
+      "paired_wall_seconds": 0.2431167100003222
+    },
+    {
+      "workload": "generated-large",
+      "seed": 8,
+      "paired_wall_seconds": 0.24102959499577992
+    },
+    {
+      "workload": "generated-large",
+      "seed": 9,
+      "paired_wall_seconds": 0.25576082900806796
+    },
+    {
+      "workload": "generated-bursty",
+      "seed": 0,
+      "paired_wall_seconds": 0.013526447000913322
+    },
+    {
+      "workload": "generated-bursty",
+      "seed": 1,
+      "paired_wall_seconds": 0.012622758003999479
+    },
+    {
+      "workload": "generated-bursty",
+      "seed": 2,
+      "paired_wall_seconds": 0.01337475200125482
+    },
+    {
+      "workload": "generated-bursty",
+      "seed": 3,
+      "paired_wall_seconds": 0.014409052993869409
+    },
+    {
+      "workload": "generated-bursty",
+      "seed": 4,
+      "paired_wall_seconds": 0.012710103997960687
+    },
+    {
+      "workload": "generated-bursty",
+      "seed": 5,
+      "paired_wall_seconds": 0.013014240001211874
+    },
+    {
+      "workload": "generated-bursty",
+      "seed": 6,
+      "paired_wall_seconds": 0.01229075700393878
+    },
+    {
+      "workload": "generated-bursty",
+      "seed": 7,
+      "paired_wall_seconds": 0.01257488300325349
+    },
+    {
+      "workload": "generated-bursty",
+      "seed": 8,
+      "paired_wall_seconds": 0.01298486499581486
+    },
+    {
+      "workload": "generated-bursty",
+      "seed": 9,
+      "paired_wall_seconds": 0.011290045993519016
+    },
+    {
+      "workload": "generated-gpu-heavy",
+      "seed": 0,
+      "paired_wall_seconds": 0.016909542988287285
+    },
+    {
+      "workload": "generated-gpu-heavy",
+      "seed": 1,
+      "paired_wall_seconds": 0.015445917000761256
+    },
+    {
+      "workload": "generated-gpu-heavy",
+      "seed": 2,
+      "paired_wall_seconds": 0.013807223993353546
+    },
+    {
+      "workload": "generated-gpu-heavy",
+      "seed": 3,
+      "paired_wall_seconds": 0.013427947997115552
+    },
+    {
+      "workload": "generated-gpu-heavy",
+      "seed": 4,
+      "paired_wall_seconds": 0.0161602970038075
+    },
+    {
+      "workload": "generated-gpu-heavy",
+      "seed": 5,
+      "paired_wall_seconds": 0.0155985659948783
+    },
+    {
+      "workload": "generated-gpu-heavy",
+      "seed": 6,
+      "paired_wall_seconds": 0.014267225997173227
+    },
+    {
+      "workload": "generated-gpu-heavy",
+      "seed": 7,
+      "paired_wall_seconds": 0.01495106500806287
+    },
+    {
+      "workload": "generated-gpu-heavy",
+      "seed": 8,
+      "paired_wall_seconds": 0.013905077008530498
+    },
+    {
+      "workload": "generated-gpu-heavy",
+      "seed": 9,
+      "paired_wall_seconds": 0.01254675599921029
+    }
+  ]
+}

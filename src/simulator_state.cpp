@@ -1,4 +1,5 @@
 #include "helios/simulator_state.hpp"
+#include "simulator_transitions.hpp"
 
 #include <algorithm>
 #include <stdexcept>
@@ -166,9 +167,7 @@ SimulatorState start_pending_job(const SimulatorState& state, JobId job_id) {
   }
 
   auto next = state;
-  next.available_resources = allocate(next.available_resources, job_it->request);
-  next.running_jobs.push_back(start_runtime_job(*job_it, state.current_time));
-  next.pending_jobs.erase(next.pending_jobs.begin() + (job_it - state.pending_jobs.begin()));
+  detail::start_pending_job_at(next, static_cast<std::size_t>(job_it - state.pending_jobs.begin()));
   return next;
 }
 
@@ -191,10 +190,8 @@ SimulatorState complete_running_job(const SimulatorState& state, JobId job_id) {
   }
 
   auto next = state;
-  next.available_resources =
-      release(next.available_resources, next.total_resources, running_it->job.request);
-  next.completed_jobs.push_back(complete_runtime_job(*running_it));
-  next.running_jobs.erase(next.running_jobs.begin() + (running_it - state.running_jobs.begin()));
+  detail::complete_running_job_at(
+      next, static_cast<std::size_t>(running_it - state.running_jobs.begin()));
   return next;
 }
 
@@ -208,8 +205,36 @@ std::vector<Job> get_schedulable_jobs(const SimulatorState& state) {
     }
   }
 
-  std::sort(schedulable_jobs.begin(), schedulable_jobs.end(), job_less);
+  if (!std::is_sorted(schedulable_jobs.begin(), schedulable_jobs.end(), job_less)) {
+    std::sort(schedulable_jobs.begin(), schedulable_jobs.end(), job_less);
+  }
   return schedulable_jobs;
 }
+
+namespace detail {
+
+void start_pending_job_at(SimulatorState& state, std::size_t index) {
+  const auto& job = state.pending_jobs.at(index);
+  const auto running = start_runtime_job(job, state.current_time);
+  const auto available = allocate(state.available_resources, job.request);
+  state.running_jobs.push_back(running);
+  state.available_resources = available;
+  state.pending_jobs.erase(state.pending_jobs.begin() + index);
+}
+
+void complete_running_job_at(SimulatorState& state, std::size_t index) {
+  const auto& running = state.running_jobs.at(index);
+  if (running.completion_time > state.current_time) {
+    throw std::runtime_error("running job has not reached completion time");
+  }
+  const auto completed = complete_runtime_job(running);
+  const auto available =
+      release(state.available_resources, state.total_resources, running.job.request);
+  state.completed_jobs.push_back(completed);
+  state.available_resources = available;
+  state.running_jobs.erase(state.running_jobs.begin() + index);
+}
+
+} // namespace detail
 
 } // namespace helios

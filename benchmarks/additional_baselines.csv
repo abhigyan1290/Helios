@@ -1,0 +1,6 @@
+workload,scheduler,estimate_percent,random_seed,job_count,makespan,total_wait_time,average_wait_time,p95_wait_time,max_wait_time
+generated-large,fifo,100,42,500,3976,843925,1687.8499999999999,3320,3457
+generated-large,oracle_sjf,100,42,500,3478,383386,766.77200000000005,2638,3262
+generated-large,estimated_sjf,100,42,500,3478,383386,766.77200000000005,2638,3262
+generated-large,random,100,42,500,3498,542050,1084.0999999999999,2907,3468
+generated-large,easy_backfill,100,42,500,3290,606160,1212.3199999999999,2564,2776

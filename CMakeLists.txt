@@ -21,10 +21,15 @@ add_library(
   src/job_state.cpp
   src/metrics.cpp
   src/resources.cpp
+  src/runtime_estimates.cpp
   src/schedule_decision.cpp
   src/schedulers/fifo_scheduler.cpp
   src/schedulers/sjf_scheduler.cpp
+  src/schedulers/estimated_sjf_scheduler.cpp
+  src/schedulers/random_scheduler.cpp
+  src/schedulers/easy_backfill_scheduler.cpp
   src/simulation_runner.cpp
+  src/simulator.cpp
   src/simulator_state.cpp
   src/version.cpp
   src/workload.cpp
@@ -36,6 +41,26 @@ add_executable(helios_sim apps/helios_sim/main.cpp)
 target_link_libraries(helios_sim PRIVATE helios_core)
 
 enable_testing()
+
+add_executable(helios_observation_policies_test tests/cpp/observation_policies_test.cpp)
+target_link_libraries(helios_observation_policies_test PRIVATE helios_core)
+add_test(NAME helios_observation_policies_test COMMAND helios_observation_policies_test)
+
+add_executable(helios_simulator_test tests/cpp/simulator_test.cpp)
+target_link_libraries(helios_simulator_test PRIVATE helios_core)
+add_test(NAME helios_simulator_test COMMAND helios_simulator_test)
+
+add_executable(helios_runtime_estimates_test tests/cpp/runtime_estimates_test.cpp)
+target_link_libraries(helios_runtime_estimates_test PRIVATE helios_core)
+add_test(NAME helios_runtime_estimates_test COMMAND helios_runtime_estimates_test)
+
+option(HELIOS_ENABLE_SCALE_TESTS "Enable slower tests with up to 12000 jobs per scheduler" OFF)
+if(HELIOS_ENABLE_SCALE_TESTS)
+  add_executable(helios_scale_test tests/cpp/scale_test.cpp)
+  target_link_libraries(helios_scale_test PRIVATE helios_core)
+  add_test(NAME helios_scale_test COMMAND helios_scale_test)
+  set_tests_properties(helios_scale_test PROPERTIES LABELS scale TIMEOUT 600)
+endif()
 
 add_executable(helios_benchmark_suite_test tests/cpp/benchmark_suite_test.cpp)
 target_link_libraries(helios_benchmark_suite_test PRIVATE helios_core)
@@ -100,3 +125,15 @@ add_test(NAME helios_csv_test COMMAND helios_csv_test)
 add_executable(helios_demo_workloads_test tests/cpp/demo_workloads_test.cpp)
 target_link_libraries(helios_demo_workloads_test PRIVATE helios_core)
 add_test(NAME helios_demo_workloads_test COMMAND helios_demo_workloads_test)
+
+# The C++ tests use assert; keep their checks active in Release builds too.
+get_property(helios_test_targets DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+foreach(helios_test_target IN LISTS helios_test_targets)
+  if(helios_test_target MATCHES "^helios_.*_test$")
+    if(MSVC)
+      target_compile_options(${helios_test_target} PRIVATE /UNDEBUG)
+    else()
+      target_compile_options(${helios_test_target} PRIVATE -UNDEBUG)
+    endif()
+  endif()
+endforeach()

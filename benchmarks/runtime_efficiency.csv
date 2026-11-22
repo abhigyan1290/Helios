@@ -1,0 +1,7 @@
+runner,sample,workload,seed,paired_wall_seconds
+before,1,scale-1000,0,0.7971386969875311
+before,2,scale-1000,0,0.847440268000355
+before,3,scale-1000,0,0.8011596400028793
+managed,1,scale-1000,0,0.03924286899564322
+managed,2,scale-1000,0,0.033302604002528824
+managed,3,scale-1000,0,0.03596211000694893

@@ -16,6 +16,9 @@ void validate_job(const Job& job) {
   if (job.duration <= 0) {
     throw std::invalid_argument("Job duration must be positive");
   }
+  if (job.estimated_duration.has_value() && *job.estimated_duration <= 0) {
+    throw std::invalid_argument("Job estimated duration must be positive when provided");
+  }
   if (job.request.gpu_count <= 0) {
     throw std::invalid_argument("Job GPU request must be positive");
   }

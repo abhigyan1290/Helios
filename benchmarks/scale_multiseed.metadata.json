@@ -1,0 +1,239 @@
+{
+  "command": [
+    "scripts/run_seeded_benchmarks.py",
+    "--scale",
+    "--workers",
+    "8",
+    "--output",
+    "benchmarks/scale_multiseed.csv"
+  ],
+  "platform": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "simulator": "/home/abhigyandoshi/Helios/build/release/helios_sim",
+  "simulator_sha256": "843ebcdd02f83c5024a15f3f18c8392d882647ef5e277804b787d674dc9a331d",
+  "seed_values": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "workers": 8,
+  "cluster": {
+    "gpu_count": 4,
+    "cpu_count": 32,
+    "memory_mb": 131072
+  },
+  "wait_metrics": {
+    "p95_wait_time": "Nearest rank ceil(0.95 * job_count), one-based",
+    "max_wait_time": "Largest per-job wait time"
+  },
+  "total_wall_seconds": 440.8680329100025,
+  "timing_note": "Paired process wall time includes both schedulers and generation; concurrent workers share host resources. This is not simulated makespan.",
+  "pairs": [
+    {
+      "workload": "scale-1000",
+      "seed": 0,
+      "paired_wall_seconds": 0.9293452569982037
+    },
+    {
+      "workload": "scale-1000",
+      "seed": 1,
+      "paired_wall_seconds": 0.9612981969985412
+    },
+    {
+      "workload": "scale-1000",
+      "seed": 2,
+      "paired_wall_seconds": 0.9559747930034064
+    },
+    {
+      "workload": "scale-1000",
+      "seed": 3,
+      "paired_wall_seconds": 0.9445706410042476
+    },
+    {
+      "workload": "scale-1000",
+      "seed": 4,
+      "paired_wall_seconds": 0.9886487229960039
+    },
+    {
+      "workload": "scale-1000",
+      "seed": 5,
+      "paired_wall_seconds": 1.0581798439961858
+    },
+    {
+      "workload": "scale-1000",
+      "seed": 6,
+      "paired_wall_seconds": 1.0322630709997611
+    },
+    {
+      "workload": "scale-1000",
+      "seed": 7,
+      "paired_wall_seconds": 1.0016091889992822
+    },
+    {
+      "workload": "scale-1000",
+      "seed": 8,
+      "paired_wall_seconds": 0.9979811499943025
+    },
+    {
+      "workload": "scale-1000",
+      "seed": 9,
+      "paired_wall_seconds": 0.9748783129907679
+    },
+    {
+      "workload": "scale-5000",
+      "seed": 0,
+      "paired_wall_seconds": 25.265791950994753
+    },
+    {
+      "workload": "scale-5000",
+      "seed": 1,
+      "paired_wall_seconds": 24.613410172998556
+    },
+    {
+      "workload": "scale-5000",
+      "seed": 2,
+      "paired_wall_seconds": 24.135704407002777
+    },
+    {
+      "workload": "scale-5000",
+      "seed": 3,
+      "paired_wall_seconds": 24.497549584993976
+    },
+    {
+      "workload": "scale-5000",
+      "seed": 4,
+      "paired_wall_seconds": 24.85973714699503
+    },
+    {
+      "workload": "scale-5000",
+      "seed": 5,
+      "paired_wall_seconds": 24.381823759002145
+    },
+    {
+      "workload": "scale-5000",
+      "seed": 6,
+      "paired_wall_seconds": 24.982512588991085
+    },
+    {
+      "workload": "scale-5000",
+      "seed": 7,
+      "paired_wall_seconds": 24.15590226399945
+    },
+    {
+      "workload": "scale-5000",
+      "seed": 8,
+      "paired_wall_seconds": 25.363455612998223
+    },
+    {
+      "workload": "scale-5000",
+      "seed": 9,
+      "paired_wall_seconds": 26.11984753899742
+    },
+    {
+      "workload": "scale-10000",
+      "seed": 0,
+      "paired_wall_seconds": 102.26487031600846
+    },
+    {
+      "workload": "scale-10000",
+      "seed": 1,
+      "paired_wall_seconds": 101.35730767599307
+    },
+    {
+      "workload": "scale-10000",
+      "seed": 2,
+      "paired_wall_seconds": 100.04799231200013
+    },
+    {
+      "workload": "scale-10000",
+      "seed": 3,
+      "paired_wall_seconds": 100.67159272299614
+    },
+    {
+      "workload": "scale-10000",
+      "seed": 4,
+      "paired_wall_seconds": 101.51460819700151
+    },
+    {
+      "workload": "scale-10000",
+      "seed": 5,
+      "paired_wall_seconds": 101.67084079999768
+    },
+    {
+      "workload": "scale-10000",
+      "seed": 6,
+      "paired_wall_seconds": 100.84261010000773
+    },
+    {
+      "workload": "scale-10000",
+      "seed": 7,
+      "paired_wall_seconds": 100.86839782900643
+    },
+    {
+      "workload": "scale-10000",
+      "seed": 8,
+      "paired_wall_seconds": 101.09676569100702
+    },
+    {
+      "workload": "scale-10000",
+      "seed": 9,
+      "paired_wall_seconds": 100.45734277500014
+    },
+    {
+      "workload": "scale-12000",
+      "seed": 0,
+      "paired_wall_seconds": 162.73113517698948
+    },
+    {
+      "workload": "scale-12000",
+      "seed": 1,
+      "paired_wall_seconds": 163.1870400129992
+    },
+    {
+      "workload": "scale-12000",
+      "seed": 2,
+      "paired_wall_seconds": 163.26429142300913
+    },
+    {
+      "workload": "scale-12000",
+      "seed": 3,
+      "paired_wall_seconds": 166.95265887001005
+    },
+    {
+      "workload": "scale-12000",
+      "seed": 4,
+      "paired_wall_seconds": 166.624930260994
+    },
+    {
+      "workload": "scale-12000",
+      "seed": 5,
+      "paired_wall_seconds": 161.60527058200387
+    },
+    {
+      "workload": "scale-12000",
+      "seed": 6,
+      "paired_wall_seconds": 158.94412108400138
+    },
+    {
+      "workload": "scale-12000",
+      "seed": 7,
+      "paired_wall_seconds": 156.60623719799332
+    },
+    {
+      "workload": "scale-12000",
+      "seed": 8,
+      "paired_wall_seconds": 147.86944384599337
+    },
+    {
+      "workload": "scale-12000",
+      "seed": 9,
+      "paired_wall_seconds": 149.93625329399947
+    }
+  ]
+}

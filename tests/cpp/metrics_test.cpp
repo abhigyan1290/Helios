@@ -1,7 +1,9 @@
 #include "helios/metrics.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <stdexcept>
+#include <utility>
 
 namespace {
 
@@ -131,6 +133,68 @@ void empty_average_wait_time_is_zero() {
   assert(helios::average_wait_time(result) == 0.0);
 }
 
+void empty_tail_waits_are_zero() {
+  const auto result = helios::make_simulation_result({});
+  assert(helios::max_wait_time(result) == 0);
+  assert(helios::p95_wait_time(result) == 0);
+}
+
+void single_job_tail_waits_equal_its_wait() {
+  const auto result = helios::make_simulation_result({completed_job(1, 3, 10, 2)});
+  assert(helios::max_wait_time(result) == 7);
+  assert(helios::p95_wait_time(result) == 7);
+}
+
+void tail_waits_handle_ties_and_zero_waits() {
+  const auto tied = helios::make_simulation_result(
+      {completed_job(1, 0, 4, 2), completed_job(2, 1, 5, 2), completed_job(3, 0, 0, 2)});
+  assert(helios::max_wait_time(tied) == 4);
+  assert(helios::p95_wait_time(tied) == 4);
+  const auto zero =
+      helios::make_simulation_result({completed_job(1, 0, 0, 2), completed_job(2, 3, 3, 2)});
+  assert(helios::max_wait_time(zero) == 0);
+  assert(helios::p95_wait_time(zero) == 0);
+}
+
+void p95_uses_nearest_rank_at_integer_boundaries_without_mutation() {
+  struct Example {
+    int count;
+    helios::SimTime expected;
+  };
+  for (const auto [count, expected] :
+       {Example{19, 19}, Example{20, 19}, Example{21, 20}, Example{100, 95}, Example{101, 96}}) {
+    std::vector<helios::CompletedJob> jobs;
+    for (int id = 1; id <= count; ++id) {
+      jobs.push_back(completed_job(id, 0, id, 1));
+    }
+    auto result = helios::make_simulation_result(std::move(jobs));
+    std::reverse(result.jobs.begin(), result.jobs.end());
+    const auto original = result;
+    assert(helios::p95_wait_time(result) == expected);
+    assert(helios::max_wait_time(result) == count);
+    assert(result == original);
+  }
+}
+
+void p95_can_exclude_an_outlier_and_be_lower_than_average() {
+  std::vector<helios::CompletedJob> jobs;
+  for (int id = 1; id < 20; ++id) {
+    jobs.push_back(completed_job(id, 0, 0, 1));
+  }
+  jobs.push_back(completed_job(20, 0, 1000, 1));
+  const auto result = helios::make_simulation_result(std::move(jobs));
+  assert(helios::p95_wait_time(result) == 0);
+  assert(helios::average_wait_time(result) == 50.0);
+  assert(helios::max_wait_time(result) == 1000);
+}
+
+void aggregate_wait_can_exceed_the_timestamp_range() {
+  const auto result = helios::make_simulation_result(
+      {completed_job(1, 0, 1500000000, 1), completed_job(2, 0, 1500000000, 1)});
+  assert(helios::total_wait_time(result) == 3000000000LL);
+  assert(helios::average_wait_time(result) == 1500000000.0);
+}
+
 } // namespace
 
 int main() {
@@ -145,6 +209,12 @@ int main() {
   total_wait_time_sums_job_wait_times();
   average_wait_time_divides_by_job_count();
   empty_average_wait_time_is_zero();
+  empty_tail_waits_are_zero();
+  single_job_tail_waits_equal_its_wait();
+  tail_waits_handle_ties_and_zero_waits();
+  p95_uses_nearest_rank_at_integer_boundaries_without_mutation();
+  p95_can_exclude_an_outlier_and_be_lower_than_average();
+  aggregate_wait_can_exceed_the_timestamp_range();
 
   return 0;
 }

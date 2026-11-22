@@ -132,6 +132,17 @@ void schedulable_jobs_include_arrived_pending_jobs() {
   assert(schedulable_jobs.front().id == 1);
 }
 
+void schedulable_jobs_sort_unsorted_public_state_without_mutation() {
+  auto state = helios::create_simulator_state(total_resources());
+  state.current_time = 5;
+  state.pending_jobs = {small_job(3, 5), small_job(4, 10), small_job(2, 0), small_job(1, 0)};
+  const auto original = state;
+  const auto jobs = helios::get_schedulable_jobs(state);
+  assert(jobs.size() == 3);
+  assert(jobs[0].id == 1 && jobs[1].id == 2 && jobs[2].id == 3);
+  assert(state == original);
+}
+
 void advancing_time_forward_succeeds() {
   const auto state = helios::advance_time(helios::create_simulator_state(total_resources()), 10);
 
@@ -326,6 +337,7 @@ int main() {
   duplicate_job_ids_are_rejected();
   schedulable_jobs_exclude_future_pending_jobs();
   schedulable_jobs_include_arrived_pending_jobs();
+  schedulable_jobs_sort_unsorted_public_state_without_mutation();
   advancing_time_forward_succeeds();
   advancing_time_to_same_time_succeeds();
   moving_time_backward_is_rejected();

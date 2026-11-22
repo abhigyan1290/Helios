@@ -80,23 +80,21 @@ Workload large_varied_100_workload() {
   return make_workload(std::move(jobs));
 }
 
-Workload generated_profile(int job_count, unsigned int seed, SimTime max_arrival_time,
-                           ResourceAmount min_gpu_count = 1) {
-  return generate_workload(
-      WorkloadGeneratorConfig{
-          .job_count = job_count,
-          .seed = seed,
-          .max_arrival_time = max_arrival_time,
-          .min_duration = 1,
-          .max_duration = 20,
-          .min_gpu_count = min_gpu_count,
-          .max_gpu_count = 4,
-          .min_cpu_count = 2,
-          .max_cpu_count = 16,
-          .min_memory_mb = 4096,
-          .max_memory_mb = 32768,
-      },
-      demo_cluster_resources());
+WorkloadGeneratorConfig generated_config(int job_count, unsigned int seed, SimTime max_arrival_time,
+                                         ResourceAmount min_gpu_count = 1) {
+  return WorkloadGeneratorConfig{
+      .job_count = job_count,
+      .seed = seed,
+      .max_arrival_time = max_arrival_time,
+      .min_duration = 1,
+      .max_duration = 20,
+      .min_gpu_count = min_gpu_count,
+      .max_gpu_count = 4,
+      .min_cpu_count = 2,
+      .max_cpu_count = 16,
+      .min_memory_mb = 4096,
+      .max_memory_mb = 32768,
+  };
 }
 
 } // namespace
@@ -171,22 +169,66 @@ Workload make_demo_workload(std::string_view name) {
     return large_varied_100_workload();
   }
   if (name == "generated-small") {
-    return generated_profile(25, 701, 50);
+    return make_generated_workload(name, 701);
   }
   if (name == "generated-medium") {
-    return generated_profile(100, 702, 100);
+    return make_generated_workload(name, 702);
   }
   if (name == "generated-large") {
-    return generated_profile(500, 703, 500);
+    return make_generated_workload(name, 703);
   }
   if (name == "generated-bursty") {
-    return generated_profile(100, 704, 3);
+    return make_generated_workload(name, 704);
   }
   if (name == "generated-gpu-heavy") {
-    return generated_profile(100, 705, 100, 2);
+    return make_generated_workload(name, 705);
   }
 
   throw std::invalid_argument("unknown demo workload");
+}
+
+WorkloadGeneratorConfig generated_workload_config(std::string_view name, unsigned int seed) {
+  if (name == "generated-small") {
+    return generated_config(25, seed, 50);
+  }
+  if (name == "generated-medium") {
+    return generated_config(100, seed, 100);
+  }
+  if (name == "generated-large") {
+    return generated_config(500, seed, 500);
+  }
+  if (name == "generated-bursty") {
+    return generated_config(100, seed, 3);
+  }
+  if (name == "generated-gpu-heavy") {
+    return generated_config(100, seed, 100, 2);
+  }
+  if (name == "scale-1000") {
+    return generated_config(1000, seed, 1000);
+  }
+  if (name == "scale-5000") {
+    return generated_config(5000, seed, 5000);
+  }
+  if (name == "scale-10000") {
+    return generated_config(10000, seed, 10000);
+  }
+  if (name == "scale-12000") {
+    return generated_config(12000, seed, 12000);
+  }
+  throw std::invalid_argument("unknown generated workload profile");
+}
+
+Workload make_generated_workload(std::string_view name, unsigned int seed) {
+  return generate_workload(generated_workload_config(name, seed), demo_cluster_resources());
+}
+
+std::vector<DemoWorkloadSpec> scale_workload_specs() {
+  return {
+      {"scale-1000", "1000 jobs arriving between times 0 and 1000"},
+      {"scale-5000", "5000 jobs arriving between times 0 and 5000"},
+      {"scale-10000", "10000 jobs arriving between times 0 and 10000"},
+      {"scale-12000", "12000 jobs arriving between times 0 and 12000"},
+  };
 }
 
 } // namespace helios
