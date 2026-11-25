@@ -1,0 +1,53 @@
+{
+  "label": "New audit reproduction; not historical training or GPU hardware measurements",
+  "profile": "generated-large",
+  "workload_seed": 703,
+  "random_policy_seed": 42,
+  "estimate_percent": 100,
+  "cluster": {
+    "gpu_count": 4,
+    "cpu_count": 32,
+    "memory_mb": 131072
+  },
+  "commands": [
+    [
+      "/home/abhigyandoshi/Helios/build/release/helios_sim",
+      "--demo-fifo",
+      "generated-large"
+    ],
+    [
+      "/home/abhigyandoshi/Helios/build/release/helios_sim",
+      "--demo-sjf",
+      "generated-large"
+    ],
+    [
+      "/home/abhigyandoshi/Helios/build/release/helios_sim",
+      "--demo-estimated-sjf",
+      "generated-large",
+      "100"
+    ],
+    [
+      "/home/abhigyandoshi/Helios/build/release/helios_sim",
+      "--demo-random",
+      "generated-large",
+      "42"
+    ],
+    [
+      "/home/abhigyandoshi/Helios/build/release/helios_sim",
+      "--demo-backfill",
+      "generated-large",
+      "100"
+    ],
+    [
+      "/home/abhigyandoshi/Helios/build/release/helios_sim",
+      "--demo-step",
+      "generated-large"
+    ]
+  ],
+  "git_commit": "5a3ed4bc76cb75c04baa5f67d1b135e03b03ba8e",
+  "worktree_dirty": true,
+  "executable_sha256": "5f18b397967b418ba11d3c93ad2e95a6a9642a61372ad10670518ee4645b8fce",
+  "gpu_allocation_method": "Integrate (4 - available_before_event) * elapsed over FIFO step trace. Fixed per-job resources and runtimes make total GPU-time policy-invariant. Divide by 4 * makespan. This is reservation occupancy, not physical utilization.",
+  "throughput_method": "Completed jobs / makespan in abstract simulation time units",
+  "notes": "One fixed workload, no confidence interval. Actual runtimes, IDs, and arrivals matched across all policies; no RL or EDF evaluation."
+}

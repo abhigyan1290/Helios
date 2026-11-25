@@ -7,3 +7,5 @@ from ._core import (
     average_wait_time, max_wait_time, no_schedule_decision, p95_wait_time,
     select_job, total_wait_time,
 )
+
+from .env import HeliosEnv

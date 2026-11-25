@@ -1,3 +1,7 @@
+#include "helios/schedulers/easy_backfill_scheduler.hpp"
+#include "helios/schedulers/estimated_sjf_scheduler.hpp"
+#include "helios/schedulers/fifo_scheduler.hpp"
+#include "helios/schedulers/random_scheduler.hpp"
 #include "helios/simulator.hpp"
 
 #include <pybind11/pybind11.h>
@@ -48,6 +52,13 @@ PYBIND11_MODULE(_core, m) {
       .def_readonly("job_id", &ScheduleDecision::job_id);
   m.def("select_job", &select_job, py::arg("job_id"));
   m.def("no_schedule_decision", &no_schedule_decision);
+  m.def("fifo_policy", &fifo_policy, py::arg("observation"));
+  m.def("estimated_sjf_schedule", &estimated_sjf_schedule, py::arg("observation"));
+  m.def("easy_backfill_schedule", &easy_backfill_schedule, py::arg("observation"));
+  py::class_<RandomScheduler>(m, "RandomScheduler")
+      .def(py::init<unsigned int>(), py::arg("seed"))
+      .def("__call__", &RandomScheduler::operator(), py::arg("observation"))
+      .def("reset", &RandomScheduler::reset, py::arg("seed"));
   py::class_<StepResult>(m, "StepResult")
       .def_readonly("elapsed_time", &StepResult::elapsed_time)
       .def_readonly("started_job_id", &StepResult::started_job_id)

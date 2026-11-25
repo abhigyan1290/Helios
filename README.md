@@ -1,7 +1,7 @@
 # Helios
 
 Helios is a C++/Python project for studying GPU cluster job scheduling with classical
-baselines and, later, reinforcement learning.
+baselines and reinforcement learning.
 
 The C++ simulator compares FIFO, oracle and estimated shortest-job-first (SJF),
 seeded random scheduling, and EASY-style backfilling. It supports both batch runs
@@ -22,8 +22,10 @@ It exports metrics as CSV, with Python scripts for plotting the results.
 - Milestone 9 separates optional runtime estimates from actual execution durations.
 - Milestone 10 adds seeded random and estimated EASY-style backfilling baselines.
 - Milestone 11 adds `Simulator::reset`, `observe`, `step`, `done`, and terminal results.
-- Phase 11 exposes the interactive C++ simulator to Python; Gymnasium and RL
-  training remain future work.
+- Phase 11 exposes the interactive C++ simulator to Python. A first Gymnasium
+  environment wraps that API.
+- Phase 12 adds seeded training episodes, masked PPO, checkpoint replay, and
+  paired held-out evaluation. See the [pilot plan](docs/Phase12.md).
 
 ## Current Capabilities
 
@@ -434,7 +436,158 @@ and terminal results do contain actual durations, so keep those separate from
 agent observations. A start does not advance time; a no-decision step advances
 to the next event. `result()` is available only after termination. C++ invalid
 argument errors become Python `ValueError`; runtime errors become `RuntimeError`.
-The binding does not yet define Gymnasium spaces, rewards, or training.
+The binding itself only exposes C++; the Python environments below define
+Gymnasium spaces and rewards.
+
+### Gymnasium Environment
+
+`HeliosEnv` wraps the C++ simulator with a fixed workload and fixed-size
+observation windows. Install the package as above to install Gymnasium and NumPy.
+
+```python
+from helios import HeliosEnv, Job, Resources, Workload
+
+cluster = Resources(1, 4, 1024)
+workload = Workload([Job(1, 0, 5, Resources(1, 1, 128), 6)])
+env = HeliosEnv(workload, cluster, max_pending=8, max_running=8)
+observation, info = env.reset(seed=42)
+observation, reward, terminated, truncated, info = env.step(0)  # start slot 0
+observation, reward, terminated, truncated, info = env.step(8)  # wait for event
+result = env.result()  # available once the episode terminates
+```
+
+Actions `0` through `max_pending - 1` select the corresponding pending slot;
+`max_pending` waits for the next arrival or completion. Empty slots, jobs that
+do not fit, out-of-range actions, and waiting when there is no future event
+raise an error without changing simulator state. Waiting is always an action in
+the space, but may fail: the environment does not reveal future arrivals to
+predict whether waiting can advance. An empty workload is already complete at
+reset; call `result()` rather than `step()`.
+
+Observations are dictionaries of integer arrays. `time`, `total_resources`,
+`available_resources`, and the pending, running, and completed counts describe
+the current state. Resource arrays are GPU count, CPU count, and memory in MB.
+`pending_jobs` rows contain ID, arrival time, GPU, CPU, memory, and estimated
+duration; zero means the estimate is missing. `pending_mask` identifies filled
+slots, and `schedulable_mask` identifies those that fit all currently available
+resources. Pending jobs are ordered by arrival time then ID. Only the first
+`max_pending` are selectable; `pending_count` includes all arrived waiting jobs.
+`running_jobs` has the same fields followed by start and elapsed time;
+`running_mask` identifies filled rows. Running jobs are ordered by start time
+then ID and truncated to `max_running`, while `running_count` reports the full
+count. Padding is zero and must be interpreted using the masks. No observation
+contains actual durations or future arrivals.
+
+The default reward is negative accumulated queue wait: on each time advance,
+`-wait_penalty * arrived_pending_count * elapsed_time`. All arrived pending jobs
+count, including jobs outside the observation window. Starting a job has zero
+elapsed time and zero reward. Because each wait ends at the next event, arrivals
+at the end of an interval accrue no wait in that interval. On a completed run,
+the sum of undiscounted rewards equals `-wait_penalty * total_wait_time(result)`.
+`wait_penalty` is finite and non-negative and defaults to 1. No time limit is
+imposed, so `truncated` is always false. Reset restores the fixed input workload;
+the seed is accepted by Gymnasium but does not generate a new workload yet.
+This base environment is a fixed-workload API. The separate training adapter
+below generates new workloads and supplies normalized features and action masks.
+
+### PPO Pilot
+
+`PilotEnv` calls the same C++ simulator through `HeliosEnv`. The policy receives
+normalized arrived-job estimates, resource requests, queue ages, and running-job
+elapsed times. Actual runtimes and future arrival times are not policy inputs.
+All 16 pilot jobs have available pending slots once they arrive; queues are not
+silently truncated. Invalid selections and waits with no possible event are
+masked. PPO may wait when an event exists even if a pending job fits.
+
+The experiment uses [SB3-Contrib MaskablePPO](https://sb3-contrib.readthedocs.io/en/master/modules/ppo_mask.html),
+with gamma 1 and a scaled negative queue-wait reward. It compares three training
+seeds with their untrained initial policies and the existing C++ FIFO,
+estimated SJF, random, and EASY backfill policies. Oracle SJF is intentionally
+excluded from this estimate-only comparison.
+
+Install the CPU training stack, test, and reproduce into a new directory:
+
+```bash
+.venv/bin/python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+.venv/bin/python -m pip install -e '.[rl]' -r tests/python/requirements.txt
+.venv/bin/python -m pytest tests/python -q
+.venv/bin/python scripts/train_ppo.py --output benchmarks/rl_pilot/replication \
+  --timesteps 65536 --seeds 0 1 2 --eval-traces 30 --jobs 16
+.venv/bin/python scripts/plot_rl_results.py \
+  --input benchmarks/rl_pilot/replication/evaluation.csv \
+  --output benchmarks/rl_pilot/replication/plots
+```
+
+Training workload seeds are sampled from `[0, 100000)`; test seeds are
+`200000..200029` for each of bursty, staggered, and mixed profiles. Each trace
+contains 16 jobs on 4 GPUs, 32 CPUs, and 131072 MB. Durations range from 1 to 24
+simulation units, arrivals from 0 to 32, and GPU requests from 1 to 4. Runtime
+estimates use independent uniform `[0.6, 1.4)` multipliers, rounded positive.
+Every policy receives identical fingerprinted inputs and every job must finish.
+The fixed final checkpoint is evaluated, with no test-set checkpoint selection.
+
+Saved artifacts include initial/final checkpoints, episode and optimization
+CSVs, a manifest, package versions, a source archive and hashes, evaluation
+workload inputs, per-episode results, and plots. The [phase plan](docs/Phase12.md)
+documents the observation boundary, reward identity, tests, and scope limits.
+
+Re-evaluate saved checkpoints without retraining, into a fresh directory:
+
+```bash
+.venv/bin/python scripts/evaluate_ppo.py \
+  --experiment benchmarks/rl_pilot/2026-11-25 \
+  --output benchmarks/rl_pilot/replay
+```
+
+#### Initial Held-Out Results
+
+The [2026-11-25 pilot](benchmarks/rl_pilot/2026-11-25/manifest.json) trained
+three seeds for 65536 transitions each (196608 total), taking about 340 seconds
+of training on this CPU setup, excluding installation, tests, and evaluation.
+Every policy completed the same **90 distinct held-out workloads / 1440 jobs**.
+Including the three trained and three untrained checkpoint replicates, the
+evaluation contains 900 completed episodes, not 900 distinct workloads.
+
+| Policy | Mean wait | Mean trace P95 wait | Mean makespan |
+| --- | ---: | ---: | ---: |
+| Estimated SJF | 24.94 | 93.39 | 129.60 |
+| PPO, mean over 3 training seeds | 35.26 | 104.75 | 129.16 |
+| Random | 37.44 | 103.92 | 128.78 |
+| EASY backfill | 38.65 | 91.99 | 133.17 |
+| FIFO | 49.97 | 100.72 | 143.53 |
+| Untrained PPO, mean over 3 initializations | 52.21 | 134.40 | 149.05 |
+
+All values are simulation time units, not hardware execution seconds. The P95
+column averages the 90 per-trace P95 values; it is not a pooled-job percentile.
+PPO reduces mean wait by **29.4% versus FIFO** and **5.8% versus random**, but its
+mean wait is **41.4% higher than estimated SJF**. Its tail-wait result is also
+worse than FIFO's, so this is not a general scheduling win.
+
+| Training seed | Untrained mean wait | Trained mean wait |
+| --- | ---: | ---: |
+| 0 | 40.21 | 34.06 |
+| 1 | 41.28 | 36.22 |
+| 2 | 75.15 | 35.50 |
+
+Each trained seed improves on its own initial checkpoint on these held-out
+inputs. The trained-seed mean-wait range is 34.06..36.22; this range is not a
+confidence interval. These are small, related synthetic distributions, not
+evidence about production GPU clusters or large-scale RL generalization.
+
+[Per-episode CSV](benchmarks/rl_pilot/2026-11-25/evaluation.csv),
+[per-seed paired comparisons](benchmarks/rl_pilot/2026-11-25/paired_comparisons.csv),
+[summary](benchmarks/rl_pilot/2026-11-25/summary.json), and
+[saved checkpoints/logs](benchmarks/rl_pilot/2026-11-25/) are retained.
+Loading the saved checkpoints and replaying evaluation reproduced the
+per-episode and per-seed comparison CSVs byte for byte on the same setup.
+
+![Paired held-out scheduling results](benchmarks/rl_pilot/2026-11-25/plots/rl_wait_comparison.png)
+
+![PPO rolling training returns, not held-out performance](benchmarks/rl_pilot/2026-11-25/plots/rl_learning_curve.png)
+
+The [per-profile plot](benchmarks/rl_pilot/2026-11-25/plots/rl_wait_by_profile.png)
+shows workload-dependent behavior. Next experiments should introduce a separate
+validation split before any tuning, then test larger queues and new distributions.
 
 ## Format
 
@@ -455,12 +608,12 @@ apps/helios_sim/   Command-line simulator executable
 include/helios/    Public C++ headers
 src/               C++ implementation
 tests/cpp/         C++ tests
-python/helios/     Future Python package
-tests/python/      Benchmark aggregation and CLI tests
+python/helios/     Simulator bindings, Gymnasium and training adapters
+tests/python/      Binding, environment, training and benchmark tests
 benchmarks/        Saved benchmark CSV outputs
 configs/           Future experiment and workload configs
 docs/              Design notes and metric definitions
-scripts/           Formatting and benchmark plotting scripts
+scripts/           Formatting, benchmarks, PPO training/evaluation and plotting
 ```
 
 ## Current Limitations
@@ -472,7 +625,11 @@ scripts/           Formatting and benchmark plotting scripts
 - Benchmarks cover 10 seeds per profile on one cluster size; broader workload
   distributions, realistic runtime predictors, and fairness policies remain future work.
 - Exact generated samples can differ between C++ standard library implementations.
-- No Gymnasium environment, PPO training, or dashboards yet.
+- PPO is a small synthetic pilot, not a validated 10000-job RL scheduler.
+  Additional training seeds, larger queues, realistic trace inputs, explicit
+  validation-based tuning, and out-of-distribution evaluation remain necessary.
+- No dashboards or real GPU job execution. Time/resource quantities describe
+  the simulator, not measured physical GPU training throughput.
 
 ## Development Workflow
 

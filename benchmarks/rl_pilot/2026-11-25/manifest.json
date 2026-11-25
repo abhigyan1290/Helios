@@ -1,0 +1,87 @@
+{
+  "config": {
+    "job_count": 16,
+    "gpu_count": 4,
+    "max_duration": 24,
+    "max_arrival": 32
+  },
+  "training_seeds": [
+    0,
+    1,
+    2
+  ],
+  "requested_timesteps_per_seed": 65536,
+  "training_workload_seed_range": [
+    0,
+    100000
+  ],
+  "test_workload_seeds": [
+    200000,
+    200001,
+    200002,
+    200003,
+    200004,
+    200005,
+    200006,
+    200007,
+    200008,
+    200009,
+    200010,
+    200011,
+    200012,
+    200013,
+    200014,
+    200015,
+    200016,
+    200017,
+    200018,
+    200019,
+    200020,
+    200021,
+    200022,
+    200023,
+    200024,
+    200025,
+    200026,
+    200027,
+    200028,
+    200029
+  ],
+  "profiles": [
+    "bursty",
+    "staggered",
+    "mixed"
+  ],
+  "device": "cpu",
+  "torch_threads": 1,
+  "python": "3.12.3",
+  "versions": {
+    "torch": "2.15.0+cpu",
+    "stable-baselines3": "2.9.2",
+    "sb3-contrib": "2.9.2",
+    "gymnasium": "1.4.0",
+    "numpy": "2.5.4"
+  },
+  "git_head": "5a3ed4bc76cb75c04baa5f67d1b135e03b03ba8e",
+  "git_status": " M README.md\n M docs/Runtime.md\n M pyproject.toml\n M python/bindings.cpp\n M python/helios/__init__.py\n?? benchmarks/audit/\n?? python/helios/env.py\n?? python/helios/rl_env.py\n?? python/helios/rl_workloads.py\n?? scripts/plot_rl_results.py\n?? scripts/train_ppo.py\n?? tests/python/test_env.py\n?? tests/python/test_policy_bindings.py\n?? tests/python/test_rl_env.py\n?? tests/python/test_rl_plots.py\n?? tests/python/test_rl_workloads.py\n",
+  "command": "scripts/train_ppo.py --output benchmarks/rl_pilot/2026-11-25 --timesteps 65536 --seeds 0 1 2 --eval-traces 30 --jobs 16",
+  "checkpoint_selection": "fixed final budget, no test-set selection or tuning",
+  "objective": "negative total wait / (job_count * max_duration), gamma=1",
+  "runs": [
+    {
+      "seed": 0,
+      "actual_timesteps": 65536,
+      "wall_seconds": 115.47350392000226
+    },
+    {
+      "seed": 1,
+      "actual_timesteps": 65536,
+      "wall_seconds": 109.35443437600043
+    },
+    {
+      "seed": 2,
+      "actual_timesteps": 65536,
+      "wall_seconds": 115.16617080200012
+    }
+  ]
+}

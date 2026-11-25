@@ -9,9 +9,9 @@
 | 10: Baselines | Seeded random, estimated SJF, estimated EASY backfilling | `observation_policies_test`, CLI tests |
 | 11: Interactive API | Reset, observe, submit one decision, wait for an event, inspect terminal metrics | `simulator_test`, interactive/batch parity tests |
 
-Python bindings expose this interactive API. Gymnasium observations/actions,
-rewards, and training remain later milestones. The interactive API does not
-define an RL action space.
+Python bindings and a first Gymnasium environment expose this interactive API.
+The C++ interactive API itself does not define an RL action space; see the
+README for the environment's current observations, actions, and reward.
 
 ## Efficiency And Ownership
 
@@ -192,4 +192,5 @@ cmake --build build/sanitize -j 4
 ctest --test-dir build/sanitize --output-on-failure
 ```
 
-The next milestone is the Gymnasium contract, followed by rewards and PPO training.
+The initial Gymnasium contract and queue-wait reward are implemented in Python;
+PPO training and evaluation remain future work.
